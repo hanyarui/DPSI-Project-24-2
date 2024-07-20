@@ -1,0 +1,119 @@
+const express = require("express");
+const router = express.Router();
+const { authenticate, authorize } = require("../middleware/auth");
+const { uploadContent } = require("../middleware/upload");
+const { contents } = require("../models");
+
+// Route to create a new content
+router.post(
+  "/",
+  authenticate,
+  authorize(["admin"]),
+  uploadContent.single("imageUrl"),
+  async (req, res) => {
+    try {
+      const { wisataName, description, address, lat, lon, country } = req.body;
+
+      let imageUrl = null;
+      if (req.file) {
+        imageUrl = req.file.path;
+      }
+
+      const content = await contents.create({
+        wisataName,
+        description,
+        address,
+        lat,
+        lon,
+        country,
+        imageUrl, // Save the image URL to the database
+      });
+
+      res.status(201).json(content);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
+
+// Route to get all contents
+router.get("/", authenticate, async (req, res) => {
+  try {
+    const content = await contents.findAll();
+    if (content.length === 0) {
+      res.status(404).json({ message: "Contents not found" });
+    } else {
+      res.json(content);
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Route to get a content by ID
+router.get("/getById/:id", authenticate, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const content = await contents.findByPk(id);
+    if (!content) throw new Error("Content not found");
+    res.json(content);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Route to get a content by name
+router.get("/getByName/:wisataName", authenticate, async (req, res) => {
+  try {
+    const { wisataName } = req.params;
+    const content = await contents.findOne({ where: { wisataName } });
+    if (!content) throw new Error("Content not found");
+    res.json(content);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Route to update a content by ID
+router.put(
+  "/updateContent/:id",
+  authenticate,
+  authorize(["admin"]),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      const content = await contents.findByPk(id);
+      if (!content) throw new Error("Content not found");
+
+      Object.keys(updates).forEach((key) => {
+        content[key] = updates[key];
+      });
+
+      await content.save();
+      res.json(content);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
+
+// Route to delete a content by ID
+router.delete(
+  "/deleteContent/:id",
+  authenticate,
+  authorize(["admin"]),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const content = await contents.findByPk(id);
+      if (!content) throw new Error("Content not found");
+      await content.destroy();
+      res.sendStatus(204);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
+
+module.exports = router;
