@@ -5,36 +5,24 @@ const { uploadContent } = require("../middleware/upload");
 const { Contents } = require("../models");
 
 // Route to create a new content
-router.post(
-  "/",
-  authenticate,
-  authorize(["admin"]),
-  uploadContent.single("imageUrl"),
-  async (req, res) => {
-    try {
-      const { wisataName, description, address, lat, lon, country } = req.body;
+router.post("/", authenticate, authorize(["admin"]), async (req, res) => {
+  try {
+    const { wisataName, description, address, lat, lon, country } = req.body;
 
-      let imageUrl = null;
-      if (req.file) {
-        imageUrl = req.file.path;
-      }
+    const content = await Contents.create({
+      wisataName,
+      description,
+      address,
+      lat,
+      lon,
+      country,
+    });
 
-      const content = await Contents.create({
-        wisataName,
-        description,
-        address,
-        lat,
-        lon,
-        country,
-        imageUrl, // Save the image URL to the database
-      });
-
-      res.status(201).json(content);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
+    res.status(201).json(content);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
-);
+});
 
 // Route to get all contents
 router.get("/", authenticate, async (req, res) => {

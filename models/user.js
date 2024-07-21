@@ -30,9 +30,9 @@ module.exports = (sequelize) => {
           key: "wisataName",
         },
       },
-      profilePic: {
-        type: DataTypes.STRING,
-      },
+      // profilePic: {
+      //   type: DataTypes.STRING,
+      // },
     },
     {
       hooks: {
