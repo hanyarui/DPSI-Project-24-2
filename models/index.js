@@ -37,6 +37,7 @@ Users.belongsTo(Contents, {
   },
   targetKey: "wisataName",
 });
+
 Favorites.belongsTo(Contents, {
   foreignKey: {
     name: "wisataID",
@@ -78,12 +79,6 @@ async function syncDatabase() {
   try {
     await sequelize.authenticate();
     console.log("Connection established successfully.");
-
-    // Drop tables in a specific order
-    await sequelize.queryInterface.dropTable("visits", { force: true });
-    await sequelize.queryInterface.dropTable("favorites", { force: true });
-    await sequelize.queryInterface.dropTable("users", { force: true });
-    await sequelize.queryInterface.dropTable("contents", { force: true });
 
     // Then synchronize all models
     await sequelize.sync({ force: true });
