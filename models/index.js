@@ -1,6 +1,10 @@
 require("dotenv").config();
 const { Sequelize, DataTypes } = require("sequelize");
 const mysql2 = require("mysql2");
+const fs = require("fs");
+
+// Read the CA certificate
+const caCert = fs.readFileSync("path/to/ca-certificate.crt");
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -14,6 +18,8 @@ const sequelize = new Sequelize(
     dialectOptions: {
       ssl: {
         require: process.env.DB_SSL === "REQUIRED",
+        rejectUnauthorized: true,
+        ca: caCert.toString(), // Add the CA certificate here
       },
     },
   }
@@ -76,7 +82,6 @@ sequelize
   .authenticate()
   .then(() => {
     console.log("Connection has been established successfully.");
-    // Sync all models
     return sequelize.sync({ alter: true }); // or { force: true } to drop and recreate tables
   })
   .then(() => {
