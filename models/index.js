@@ -81,7 +81,7 @@ async function syncDatabase() {
     console.log("Connection established successfully.");
 
     // Then synchronize all models
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ alter: true });
 
     console.log("Database synchronized successfully");
   } catch (error) {
