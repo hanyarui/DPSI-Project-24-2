@@ -1,13 +1,10 @@
 const jwt = require("jsonwebtoken");
 
 const authenticate = (req, res, next) => {
-  const authHeader = req.header("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  const token = req.header("Authorization").replace("Bearer ", "");
+  if (!token) {
     return res.status(401).json({ message: "No token, authorization denied" });
   }
-
-  const token = authHeader.replace("Bearer ", "");
-
   try {
     const decoded = jwt.verify(token, "your_jwt_secret");
     req.user = decoded;
@@ -19,7 +16,7 @@ const authenticate = (req, res, next) => {
 
 const authorize = (roles = []) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!roles.includes(req.user.role)) {
       return res.status(403).json({ message: "Access Denied" });
     }
     next();
