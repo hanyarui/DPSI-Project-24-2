@@ -4,7 +4,7 @@ const mysql2 = require("mysql2");
 const fs = require("fs");
 
 // Read the CA certificate
-const caCert = fs.readFileSync("path/to/ca-certificate.crt");
+const caCert = fs.readFileSync("./ca-certificate.crt");
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
