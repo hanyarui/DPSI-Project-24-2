@@ -73,19 +73,29 @@ Visits.belongsTo(Contents, {
   targetKey: "wisataID",
 });
 
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log("Connection has been established successfully.");
-    // Sync all models
-    return sequelize.sync({ force: true }); // or { force: true } to drop and recreate tables
-  })
-  .then(() => {
-    console.log("Database synchronized successfully.");
-  })
-  .catch((err) => {
-    console.error("Unable to connect to the database:", err);
-  });
+// New function to sync database
+async function syncDatabase() {
+  try {
+    await sequelize.authenticate();
+    console.log("Connection established successfully.");
+
+    // Drop tables in a specific order
+    await sequelize.queryInterface.dropTable("Favorites", { force: true });
+    await sequelize.queryInterface.dropTable("Visits", { force: true });
+    await sequelize.queryInterface.dropTable("Users", { force: true });
+    await sequelize.queryInterface.dropTable("Contents", { force: true });
+
+    // Then synchronize all models
+    await sequelize.sync({ force: true });
+
+    console.log("Database synchronized successfully");
+  } catch (error) {
+    console.error("Error synchronizing database:", error);
+  }
+}
+
+// Call the function to sync the database
+syncDatabase();
 
 module.exports = {
   sequelize,
@@ -93,4 +103,5 @@ module.exports = {
   Contents,
   Favorites,
   Visits,
+  syncDatabase,
 };
