@@ -11,11 +11,9 @@ const sequelize = new Sequelize(
     port: process.env.DB_PORT,
     dialect: "mysql",
     dialectModule: mysql2,
-    logging: false,
     dialectOptions: {
       ssl: {
         require: process.env.DB_SSL === "REQUIRED",
-        rejectUnauthorized: false,
       },
     },
   }
@@ -78,6 +76,11 @@ sequelize
   .authenticate()
   .then(() => {
     console.log("Connection has been established successfully.");
+    // Sync all models
+    return sequelize.sync({ alter: true }); // or { force: true } to drop and recreate tables
+  })
+  .then(() => {
+    console.log("Database synchronized successfully.");
   })
   .catch((err) => {
     console.error("Unable to connect to the database:", err);
