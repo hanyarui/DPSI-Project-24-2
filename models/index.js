@@ -29,7 +29,7 @@ const Visits = require("./visit")(sequelize, DataTypes);
 Users.belongsTo(Contents, {
   foreignKey: {
     name: "wisataName",
-    allowNull: false,
+    allowNull: true,
     references: {
       model: Contents,
       key: "wisataName",
