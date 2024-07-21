@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { users } = require("../models/index");
+const { Users } = require("../models/index");
 const { uploadProfilePic } = require("../middleware/upload");
 const { authenticate } = require("../middleware/auth");
 
@@ -16,7 +16,7 @@ router.post(
           .json({ message: "File size is too large. Max file size is 10MB" });
       }
 
-      const user = await users.findByPk(req.user.id);
+      const user = await Users.findByPk(req.user.id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }

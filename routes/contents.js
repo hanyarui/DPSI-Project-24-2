@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { authenticate, authorize } = require("../middleware/auth");
 const { uploadContent } = require("../middleware/upload");
-const { contents } = require("../models");
+const { Contents } = require("../models");
 
 // Route to create a new content
 router.post(
@@ -19,7 +19,7 @@ router.post(
         imageUrl = req.file.path;
       }
 
-      const content = await contents.create({
+      const content = await Contents.create({
         wisataName,
         description,
         address,
@@ -39,7 +39,7 @@ router.post(
 // Route to get all contents
 router.get("/", authenticate, async (req, res) => {
   try {
-    const content = await contents.findAll();
+    const content = await Contents.findAll();
     if (content.length === 0) {
       res.status(404).json({ message: "Contents not found" });
     } else {
@@ -54,7 +54,7 @@ router.get("/", authenticate, async (req, res) => {
 router.get("/getById/:id", authenticate, async (req, res) => {
   try {
     const { id } = req.params;
-    const content = await contents.findByPk(id);
+    const content = await Contents.findByPk(id);
     if (!content) throw new Error("Content not found");
     res.json(content);
   } catch (error) {
@@ -66,7 +66,7 @@ router.get("/getById/:id", authenticate, async (req, res) => {
 router.get("/getByName/:wisataName", authenticate, async (req, res) => {
   try {
     const { wisataName } = req.params;
-    const content = await contents.findOne({ where: { wisataName } });
+    const content = await Contents.findOne({ where: { wisataName } });
     if (!content) throw new Error("Content not found");
     res.json(content);
   } catch (error) {
@@ -83,7 +83,7 @@ router.put(
     try {
       const { id } = req.params;
       const updates = req.body;
-      const content = await contents.findByPk(id);
+      const content = await Contents.findByPk(id);
       if (!content) throw new Error("Content not found");
 
       Object.keys(updates).forEach((key) => {
@@ -106,7 +106,7 @@ router.delete(
   async (req, res) => {
     try {
       const { id } = req.params;
-      const content = await contents.findByPk(id);
+      const content = await Contents.findByPk(id);
       if (!content) throw new Error("Content not found");
       await content.destroy();
       res.sendStatus(204);

@@ -2,8 +2,8 @@ const { DataTypes } = require("sequelize");
 const bcrypt = require("bcryptjs");
 
 module.exports = (sequelize) => {
-  const User = sequelize.define(
-    "User",
+  return sequelize.define(
+    "users",
     {
       email: {
         type: DataTypes.STRING,
@@ -41,8 +41,9 @@ module.exports = (sequelize) => {
           user.password = await bcrypt.hash(user.password, salt);
         },
       },
+    },
+    {
+      tableName: "users",
     }
   );
-
-  return User;
 };

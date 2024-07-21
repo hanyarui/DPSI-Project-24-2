@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { users } = require("../models/index"); // Ensure correct import
+const { Users } = require("../models/index"); // Ensure correct import
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -8,7 +8,7 @@ router.post("/register", async (req, res, next) => {
   try {
     const { email, name, password, role } = req.body;
     console.log("Creating user:", email, role);
-    const newUser = await users.create({ email, name, password, role });
+    const newUser = await Users.create({ email, name, password, role });
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
     console.error("Error creating user:", err);
@@ -19,7 +19,7 @@ router.post("/register", async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await users.findOne({ where: { email } });
+    const user = await Users.findOne({ where: { email } });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }

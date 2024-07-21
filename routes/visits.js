@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { authenticate } = require("../middleware/auth");
-const { visits, contents, users } = require("../models");
+const { Visits, Contents, Users } = require("../models");
 const { Op } = require("sequelize");
 const { Parser } = require("json2csv");
 const fs = require("fs");
@@ -37,7 +37,7 @@ router.post("/", authenticate, async (req, res) => {
 
   // Validate visitors are registered users
   try {
-    const validVisitors = await users.findAll({
+    const validVisitors = await Users.findAll({
       where: {
         email: {
           [Op.in]: listVisitor,
@@ -52,7 +52,7 @@ router.post("/", authenticate, async (req, res) => {
     }
 
     // Check if a visit with the same wisataID and visitDate exists
-    const existingVisit = await visits.findOne({
+    const existingVisit = await Visits.findOne({
       where: {
         wisataID,
         visitDate: {
@@ -72,7 +72,7 @@ router.post("/", authenticate, async (req, res) => {
       res.status(200).json(existingVisit);
     } else {
       // Create a new visit entry
-      const newVisit = await visits.create({
+      const newVisit = await Visits.create({
         wisataID,
         listVisitor,
         visitDate: visitDate ? new Date(visitDate) : new Date(),
@@ -87,8 +87,8 @@ router.post("/", authenticate, async (req, res) => {
 // Get all visits
 router.get("/", authenticate, async (req, res) => {
   try {
-    const allVisits = await visits.findAll({
-      include: [{ model: contents }],
+    const allVisits = await Visits.findAll({
+      include: [{ model: Contents }],
     });
     res.status(200).json(allVisits);
   } catch (error) {
@@ -100,13 +100,13 @@ router.get("/", authenticate, async (req, res) => {
 router.get("/by-date/:date", authenticate, async (req, res) => {
   const { date } = req.params;
   try {
-    const visitByDate = await visits.findAll({
+    const visitByDate = await Visits.findAll({
       where: {
         visitDate: {
           [Op.eq]: new Date(date),
         },
       },
-      include: [{ model: contents }],
+      include: [{ model: Contents }],
     });
     res.status(200).json(visitByDate);
   } catch (error) {
@@ -122,13 +122,13 @@ router.get("/by-week/:week", authenticate, async (req, res) => {
   endOfWeek.setDate(endOfWeek.getDate() + 6);
 
   try {
-    const visitByWeek = await visits.findAll({
+    const visitByWeek = await Visits.findAll({
       where: {
         visitDate: {
           [Op.between]: [startOfWeek, endOfWeek],
         },
       },
-      include: [{ model: contents }],
+      include: [{ model: Contents }],
     });
     res.status(200).json(visitByWeek);
   } catch (error) {
@@ -147,13 +147,13 @@ router.get("/by-month/:month", authenticate, async (req, res) => {
   );
 
   try {
-    const visitByMonth = await visits.findAll({
+    const visitByMonth = await Visits.findAll({
       where: {
         visitDate: {
           [Op.between]: [startOfMonth, endOfMonth],
         },
       },
-      include: [{ model: contents }],
+      include: [{ model: Contents }],
     });
     res.status(200).json(visitByMonth);
   } catch (error) {
@@ -168,13 +168,13 @@ router.get("/by-year/:year", authenticate, async (req, res) => {
   const endOfYear = new Date(year, 11, 31);
 
   try {
-    const visitByYear = await visits.findAll({
+    const visitByYear = await Visits.findAll({
       where: {
         visitDate: {
           [Op.between]: [startOfYear, endOfYear],
         },
       },
-      include: [{ model: contents }],
+      include: [{ model: Contents }],
     });
     res.status(200).json(visitByYear);
   } catch (error) {
@@ -190,13 +190,13 @@ router.get("/export/by-week/:week", authenticate, async (req, res) => {
   endOfWeek.setDate(endOfWeek.getDate() + 6);
 
   try {
-    const visitByWeek = await visits.findAll({
+    const visitByWeek = await Visits.findAll({
       where: {
         visitDate: {
           [Op.between]: [startOfWeek, endOfWeek],
         },
       },
-      include: [{ model: contents }],
+      include: [{ model: Contents }],
     });
 
     generateCSV(visitByWeek, res);
@@ -216,13 +216,13 @@ router.get("/export/by-month/:month", authenticate, async (req, res) => {
   );
 
   try {
-    const visitByMonth = await visits.findAll({
+    const visitByMonth = await Visits.findAll({
       where: {
         visitDate: {
           [Op.between]: [startOfMonth, endOfMonth],
         },
       },
-      include: [{ model: contents }],
+      include: [{ model: Contents }],
     });
 
     generateCSV(visitByMonth, res);
@@ -238,13 +238,13 @@ router.get("/export/by-year/:year", authenticate, async (req, res) => {
   const endOfYear = new Date(year, 11, 31);
 
   try {
-    const visitByYear = await visits.findAll({
+    const visitByYear = await Visits.findAll({
       where: {
         visitDate: {
           [Op.between]: [startOfYear, endOfYear],
         },
       },
-      include: [{ model: contents }],
+      include: [{ model: Contents }],
     });
 
     generateCSV(visitByYear, res);

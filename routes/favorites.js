@@ -1,18 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const { authenticate } = require("../middleware/auth");
-const { favorites } = require("../models");
+const { Favorites } = require("../models");
 
 // Route to create a new favorite
 router.post("/", authenticate, async (req, res) => {
   try {
     const { email, wisataID, isFavorite } = req.body;
-    const favorite = await favorites.create({
+    const Favorite = await Favorites.create({
       email,
       wisataID,
       isFavorite,
     });
-    res.status(201).json(favorite);
+    res.status(201).json(Favorite);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -21,11 +21,11 @@ router.post("/", authenticate, async (req, res) => {
 // Route to get all favorite
 router.get("/", authenticate, async (req, res) => {
   try {
-    const favorite = await favorites.findAll();
-    if (favorite.length === 0) {
+    const Favorite = await Favorites.findAll();
+    if (Favorite.length === 0) {
       res.status(404).json({ message: "Favorites not found" });
     } else {
-      res.json(favorite);
+      res.json(Favorite);
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -36,9 +36,9 @@ router.get("/", authenticate, async (req, res) => {
 router.delete("/deleteFavorite/:id", authenticate, async (req, res) => {
   try {
     const { id } = req.params;
-    const favorite = await favorites.findByPk(id);
-    if (!favorite) throw new Error("Favorite not found");
-    await favorite.destroy();
+    const Favorite = await Favorites.findByPk(id);
+    if (!Favorite) throw new Error("Favorite not found");
+    await Favorite.destroy();
     res.sendStatus(204);
   } catch (error) {
     res.status(400).json({ message: error.message });
