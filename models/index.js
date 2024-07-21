@@ -80,10 +80,10 @@ async function syncDatabase() {
     console.log("Connection established successfully.");
 
     // Drop tables in a specific order
-    await sequelize.queryInterface.dropTable("Favorites", { force: true });
-    await sequelize.queryInterface.dropTable("Visits", { force: true });
-    await sequelize.queryInterface.dropTable("Users", { force: true });
-    await sequelize.queryInterface.dropTable("Contents", { force: true });
+    await sequelize.queryInterface.dropTable("visits", { force: true });
+    await sequelize.queryInterface.dropTable("favorites", { force: true });
+    await sequelize.queryInterface.dropTable("users", { force: true });
+    await sequelize.queryInterface.dropTable("contents", { force: true });
 
     // Then synchronize all models
     await sequelize.sync({ force: true });
